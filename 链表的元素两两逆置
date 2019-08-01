@@ -1,0 +1,61 @@
+#include<stdio.h>
+#include<malloc.h>
+
+typedef struct LNode
+{
+	struct LNode* next;
+	int data;
+}LNode;
+
+LNode* createListR(LNode* C, int a[], int n)	//要改变的变量用引用型   尾插法
+{
+	LNode* s, * r;  //s用来指向新申请的节点，r用来指向链表最后一个节点
+	int i;
+	C = (LNode*)malloc(sizeof(LNode));
+	C->next = NULL;
+	r = C;
+	for (i = 0; i < n; i++)
+	{
+		s = (LNode*)malloc(sizeof(LNode));
+		s->data = a[i];
+		r->next = s;
+		r = r->next;
+	}
+	r->next = NULL;
+	return C->next;
+}
+
+void traversal(LNode* head)
+{
+	LNode* p = head;
+	while (p)
+	{
+		printf("%d  ", p->data);
+		p = p->next;
+	}
+}
+
+struct LNode* swapPairs(struct LNode* head) {     //递归进行链表的元素两两逆置
+
+	if (head == NULL || head->next == NULL)
+	{
+		return head;
+	}
+	LNode* next = head->next;
+	head->next = swapPairs(next->next);
+	next->next = head;
+	return next;
+}
+
+int main()
+{
+	int a[4] = { 1,2,3,4 };
+	LNode* head = NULL;
+	head = createListR(head, a, 4);
+	printf("\n\n  完成链表元素两两逆置   \n\n转换前的链表   ");
+	traversal(head);
+	printf("\n\n\n转换后的链表   ");
+	head = swapPairs(head);
+	traversal(head);
+	printf("\n\n\n");
+}
