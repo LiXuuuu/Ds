@@ -1,0 +1,417 @@
+#include<stdio.h>
+#include <malloc.h>
+#include <string>
+using namespace std;
+#define MAXSIZE 50
+
+//单链表结构体
+typedef struct LNode {
+	int data;
+	struct LNode* next;
+}LNode;
+
+//顺序队列
+typedef struct SqQueue {
+	int data[MAXSIZE];
+	int front;
+	int rear;
+}SqQueue;
+
+//根据数组创建单链表（尾插法）
+void CreateLNodeR(LNode*& C, int a[], int length) {
+	LNode* s, * r;
+	int i;
+	C = (LNode*)malloc(sizeof(LNode));
+	C->next = NULL;
+	r = C;
+	for (i = 0; i < length; i++)
+	{
+		s = (LNode*)malloc(sizeof(LNode));
+		s->data = a[i];
+		r->next = s;
+		r = r->next;
+	}
+	r->next = NULL;
+}
+
+//打印单链表
+void PrintLNode(LNode* p)
+{
+	if (p == NULL || p->next == NULL)
+		return;
+	LNode* s = p->next;
+	while (s->next != NULL)
+	{
+		printf("%d->", s->data);
+		s = s->next;
+	}
+	printf("%d", s->data);
+}
+//打印数组
+void printArr(int a[], int length)
+{
+	int i;
+	for (i = 0; i < length; i++)
+	{
+		printf("%d ", a[i]);
+	}
+}
+
+//快速找到未知长度链表的中间节点
+//快慢指针：设置两个指针，一个指针一次走两步，另一个指针一次走一步。
+LNode* getMidNode(LNode* head)
+{
+	LNode* p, * q;
+	p = head->next;//头节点不算
+	q = head->next;
+	while (q->next != NULL)
+	{
+		if (q->next->next != NULL)
+		{
+			q = q->next->next;
+			p = p->next;
+		}
+		else
+		{
+			q = q->next;
+		}
+	}
+	return p;
+}
+
+//荷兰国旗
+//给定一个包含红色、白色和蓝色，一共 n 个元素的数组，原地对它们进行排序，使得相同颜色的元素相邻，并按照红色、白色、蓝色顺序排列。
+//此题中，我们使用整数 0、 1 和 2 分别表示红色、白色和蓝色。
+//使用快速排序算法的思想，来进行排序，当0和2排好位置，那么1也就排好了
+void sortColors(int nums[], int length)
+{
+	int temp, low = 0, mid = 0, high = length - 1;
+	while (mid <= high)
+	{
+		if (nums[mid] == 0)
+		{
+			temp = nums[low];
+			nums[low] = nums[mid];
+			nums[mid] = temp;
+			low++;
+			mid++;
+		}
+		else if (nums[mid] == 1)
+		{
+			mid++;
+		}
+		else if (nums[mid] == 2)
+		{
+			temp = nums[high];
+			nums[high] = nums[mid];
+			nums[mid] = temp;
+			high--;
+		}
+	}
+}
+
+//奇偶链表
+//给定一个单链表，把所有的奇数节点和偶数节点分别排在一起。请注意，这里的奇数节点和偶数节点指的是节点编号的奇偶性，而不是节点的值的奇偶性。
+//请尝试使用原地算法完成。你的算法的空间复杂度应为 O(1)，时间复杂度应为 O(nodes)，nodes 为节点总数
+void oddEvenList(LNode* head)
+{
+	LNode* odd = head->next;		//奇数
+	LNode* even = head->next->next;	//偶数
+	LNode* even_first = even;
+	while (odd->next != NULL && even->next != NULL)
+	{
+		odd->next = odd->next->next;
+		even->next = even->next->next;
+		odd = odd->next;
+		even = even->next;
+	}
+	odd->next = even_first;
+}
+
+//两个数组的交集
+//给定两个数组，求出数组的交集
+//1.数组排序--选择排序
+void selectSort(int arr[], int n)
+{
+	int i, j, k;
+	int temp;
+	for (i = 0; i < n; i++)
+	{
+		k = i;
+		//从无需序列中挑出一个最小的关键字
+		for (j = i + 1; j < n; j++)
+		{
+			if (arr[k] > arr[j])
+				k = j;
+		}
+		temp = arr[i];
+		arr[i] = arr[k];
+		arr[k] = temp;
+	}
+}
+//2.数组降重
+int operation(int a[], int length)
+{
+	int i = 0;
+	int j;
+	int a_length = length;
+	for (j = 1; j < length; j++)
+	{
+		if (a[j] == a[i])
+		{
+			int k = i;
+			while (k < length - 1)
+			{
+				a[k] = a[k + 1];
+				k++;
+			}
+			length--;
+			j--;
+		}
+		else
+		{
+			i++;
+		}
+	}
+	return length;	//返回去重后的数组长度
+}
+//3.求交集
+void getIntersection(int a[], int a_length, int b[], int b_length, int c[])
+{
+	int i, j,k = 0;
+	selectSort(a, a_length);
+	selectSort(b, b_length);
+	for (j = 0; j < b_length; j++)
+	{
+		for (i = 0; i < a_length; i++)
+		{
+			if (b[j] == a[i])
+			{
+				c[k++] = b[j];
+				break;
+			}
+		}
+	}
+	k = operation(c, k);
+	printArr(c, k);
+}
+
+//查找链表的倒数第k个节点
+int getKNode(LNode* head, int k)
+{
+	LNode* p = head;
+	LNode* q = head;
+	int i = 0;
+	while (i < k && q != NULL)
+	{
+		q = q->next;
+		i++;
+	}
+	while (q!= NULL)
+	{
+		q = q->next;
+		p = p->next;
+	}
+	if (p == head)
+		return -999;
+	else
+		return p->data;
+
+}
+
+//只出现一次的数字 在数组中有一个数字只出现一次，其他的数字全只重复两次
+//使用异或操作，将数组中的数字挨个异或，得到的结果就是所要求的值
+int getOneNum(int a[],int length)
+{
+	int num = a[0];
+	int i;
+	for (i = 1; i < length; i++)
+	{
+		num = num ^ a[i];
+	}
+	return num;
+}
+
+//原地移除元素
+//不使用额外空间原地修改数组，顺序可以改变
+int delElem(int a[], int val, int length)
+{
+	int i;
+	int temp;
+	int len = length;
+	for (i = 0; i < len; )
+	{
+		if (a[i] == val)
+		{
+			temp = a[i];
+			a[i] = a[len - 1];
+			a[len - 1] = temp;
+			len--;
+		}
+		else
+		{
+			i++;
+		}
+	}
+	return len;
+}
+
+//查找相交链表的相交界点
+LNode* getIntersectNode(LNode* a, LNode* b)
+{
+	LNode* p = a->next;
+	LNode* q = b->next;
+	while (p != q)
+	{
+		p = (p->next) ? p->next : a->next;
+		q = (q->next) ? q->next : b->next;
+	}
+	return p;
+}
+
+//链表的元素两两逆置
+LNode* swapPairs(struct LNode* head) {     //递归进行链表的元素两两逆置
+
+	if (head == NULL || head->next == NULL)
+	{
+		return head;
+	}
+	LNode* next = head->next;
+	head->next = swapPairs(next->next);
+	next->next = head;
+	return next;
+}
+
+//反转字符串
+void swap(string& s, int i, int j)
+{
+	char temp = s[i];
+	s[i] = s[j];
+	s[j] = temp;
+}
+
+string reverseString(string s)
+{
+	int length = s.size();
+	int i = 0;
+	int j = length - 1;
+	while (i < j)
+	{
+		swap(s, i++, j--);
+	}
+	return s;
+}
+
+//杨辉三角
+void Yang_Hui_Triangle(int lines)
+{
+	int i,j,k;
+	int arr[MAXSIZE][MAXSIZE];
+	//设置数组值
+	for (i = 0; i < lines; i++)
+	{
+		arr[i][0] = arr[i][i] = 1;
+	}
+	for (j = 2; j < lines; j++)
+	{
+		for (k = 1; k < j; k++)
+		{
+			arr[j][k] = arr[j - 1][k - 1] + arr[j - 1][k];
+		}
+	}
+	
+	//打印杨辉三角
+	for (i = 0; i < lines; i++)
+	{
+		printf("\n");
+		for (j = 0; j < lines - i; j++)
+		{
+			printf("  ");
+		}
+		for (k = 0; k <= i; k++)
+		{
+			printf(" %d  ",arr[i][k]);
+		}
+	}
+}
+
+//连续增长的最长序列
+int max(int a, int b)
+{
+	return a > b ? a : b;
+}
+int maxRise(int a[], int length)
+{
+	int count = 1;
+	int res = 0;
+	int i;
+	for (i = 0; i < length-1; i++)
+	{
+		if (a[i + 1] > a[i])
+			res = max(res, ++count);
+		else
+			count = 1;
+	}
+	return res;
+}
+
+
+
+int main()
+{
+	LNode* head = (LNode*)malloc(sizeof(LNode));
+	int a[] = { 1,2,3,4,5,6,7,8,9 };
+	CreateLNodeR(head, a, 9);
+	//LNode* p = getMidNode(head);
+	//printf("head链表的中间节点是%d ", p->data);
+	//oddEvenList(head);
+	//PrintLNode(head);
+	//int p = getKNode(head, 9);
+	//printf("倒数第9个节点是：%d", p); 
+    head->next = swapPairs(head->next);
+	PrintLNode(head);
+
+
+	//LNode* la = (LNode*)malloc(sizeof(LNode));
+	//LNode* lb = (LNode*)malloc(sizeof(LNode));
+	//int a[] = { 1,2,3,4,5,6 };
+	//int b[] = { 1,2,3 };
+	//CreateLNodeR(la, a, 6);
+	//CreateLNodeR(lb, b, 3);
+	//lb->next->next->next->next = la->next->next->next->next;
+	//LNode* Intersect = getIntersectNode(la, lb);
+	//printf("la和lb相交的节点是：%d", Intersect->data);
+
+	//int a[] = { 1,2,0,1,0,2,2,0,1,2,1,0 };
+	//sortColors(a, 12);
+	//printArr(a, 12);
+	//int a[] = { 1,2,2,1,2,1,3,4 };
+	//int b[] = { 2,4,2,2,2,4,3,3,3,3,3,3,3,2,2,2,2,2,2,2 };
+	//int c[MAXSIZE];
+	//getIntersection(a, 8, b, 20, c);
+
+	//int a[] = { 1,1,2,2,4,5,5};
+	//int num = getOneNum(a,7);
+	//printf("a数组中只出现一次的数字为：%d", num);
+	
+	//int a[] = { 1,2,3,2,2,3,3,3,3,4,4,4,5 };
+	//int len = delElem(a, 3,13);
+	//printArr(a, len);
+	
+	//string s = "hello";
+	//s = reverseString(s);
+	//int i = 0;
+	//while (i < s.size())
+	//{
+	//	printf("%c ", s[i]);
+	//	i++;
+	//}
+
+	//Yang_Hui_Triangle(5);
+
+	//int a[] = { 1,2,3,4,5,2,3,4,5,6,7,4 };
+	//int k = maxRise(a, 12);
+	//printf("%d ",k);
+
+	return 0;
+}
