@@ -1,0 +1,223 @@
+#include<stdio.h>
+#include <malloc.h>
+#define MAXSIZE 50
+
+//单链表结构体
+typedef struct LNode {
+	int data;
+	struct LNode* next;
+}LNode;
+
+//顺序栈
+typedef struct Sqstack {
+	int data[MAXSIZE];
+	int top;
+}Sqstack;
+
+//顺序队列
+typedef struct SqQueue {
+	int data[MAXSIZE];
+	int front;
+	int rear;
+}SqQueue;
+
+//根据数组创建单链表（尾插法）
+void CreateLNodeR(LNode*& C, int a[], int length) {
+	LNode* s, * r;
+	int i;
+	C = (LNode*)malloc(sizeof(LNode));
+	C->next = NULL;
+	r = C;
+	for (i = 0; i < length; i++)
+	{
+		s = (LNode*)malloc(sizeof(LNode));
+		s->data = a[i];
+		r->next = s;
+		r = r->next;
+	}
+	r->next = NULL;
+}
+//根据数组创建单链表（头插法）
+void CreateLNodeF(LNode*& C, int a[], int length) {
+	LNode* s;
+	int i;
+	C = (LNode*)malloc(sizeof(LNode));
+	C->next = NULL;
+	for (i = 0; i < length; i++)
+	{
+		s = (LNode*)malloc(sizeof(LNode));
+		s->data = a[i];
+		s->next = C->next;
+		C->next = s;
+	}
+}
+//逆置单链表
+void ReverseLNode(LNode*& C) {
+	LNode* p = C->next;
+	LNode* q;
+	C->next = NULL;
+	while (p != NULL)
+	{
+		q = p->next;
+		p->next = C->next;
+		C->next = p;
+		p = q;
+	}
+}
+//删除单链表第k个节点
+void DelKthNode(LNode*& C, int k)
+{
+	if (C->next == NULL)
+		return;
+	LNode* p = C;
+	LNode* q = p->next;
+	int i = 1;
+	while (i < k)
+	{
+		p = q;
+		q = q->next;
+		i++;
+	}
+	p->next = q->next;
+}
+//删除值为X的节点
+void DelXNode(LNode*& C, int x)
+{
+	if (C->next == NULL)
+		return;
+	LNode* p = C;
+	LNode* q = p->next;
+	while (q)
+	{
+		if (q->data == x)
+		{
+			p->next = q->next;
+			q = q->next;
+		}
+		else
+		{
+			p = p->next;
+			q = q->next;
+		}
+	}
+}
+//查找单链表的倒数第k个节点
+int FindElem(LNode*& C, int k) {
+	LNode* p = C;
+	LNode* q = C;
+	int i = 1;
+	while (i <= k)
+	{
+		q = q->next;
+		i++;
+	}
+	while (q != NULL)
+	{
+		p = p->next;
+		q = q->next;
+	}
+	if (p == C)
+		return -1;
+	else
+		return p->data;
+}
+//将两个按值有序的链表合并为一个链表
+LNode* MergeTwoList(LNode* l1, LNode* l2)
+{
+	if (l1 == NULL)
+		return l2;
+	if (l2 == NULL)
+		return l1;
+	if (l1->data <= l2->data)
+	{
+		l1->next = MergeTwoList(l1->next, l2);
+		return l1;
+	}
+	else
+	{
+		l2->next = MergeTwoList(l1, l2->next);
+		return l2;
+	}
+}
+//打印单链表
+void PrintLNode(LNode* p)
+{
+	if (p == NULL || p->next == NULL)
+		return;
+	LNode* s = p->next;
+	while (s->next != NULL)
+	{
+		printf("%d->", s->data);
+		s = s->next;
+	}
+	printf("%d", s->data);
+}
+//进栈
+int push(Sqstack& st, int x)
+{
+	if (st.top == MAXSIZE - 1)
+		return 0;
+	st.data[++st.top] = x;
+	return 1;
+}
+//出栈
+int pop(Sqstack& st, int& x)
+{
+	if (st.top == -1)
+		return 0;
+	x = st.data[st.top--];
+	return 1;
+}
+//进队
+int enQueue(SqQueue& qu, int x)
+{
+	if (qu.front == (qu.rear + 1) % MAXSIZE)
+		return 0;
+	qu.rear = (qu.rear + 1) % MAXSIZE;
+	qu.data[qu.rear] = x;
+	return 1;
+}
+//出队
+int deQueue(SqQueue& qu, int& x)
+{
+	if (qu.front == qu.rear)
+		return 0;
+	qu.front = (qu.front + 1) % MAXSIZE;
+	x = qu.data[qu.front];
+	return 1;
+}
+
+int main() {
+	/*LNode* LR,*LF;
+	LR = (LNode*)malloc(sizeof(LNode));
+	LF = (LNode*)malloc(sizeof(LNode));
+	int a[] = { 1,2,3,4,5,6,7,8,9 };
+	CreateLNodeR(LR, a, 9);
+	CreateLNodeF(LF, a, 9);
+	printf("尾插法的结果LR：");
+	PrintLNode(LR);
+	printf("\n\n头插法的结果LF：");
+	PrintLNode(LF);
+	ReverseLNode(LR);
+	printf("\n\n逆置 LR 的结果：");
+	PrintLNode(LR);
+	DelKthNode(LR, 3);
+	printf("\n\n删除第3个节点的LR：");
+	PrintLNode(LR);
+	DelXNode(LR, 3);
+	printf("\n\n删除3之后的LR：");
+	PrintLNode(LR);
+	int x = FindElem(LR, 3);
+	printf("\n\nLR的倒数第3个节点是：%d", x);*/
+
+	//测试*合并链表*算法
+	LNode* l1, * l2;
+	l1 = (LNode*)malloc(sizeof(LNode));
+	l2 = (LNode*)malloc(sizeof(LNode));
+	int a[] = { 1,3,5,7,9 };
+	int b[] = { 2,4,6,8 };
+	CreateLNodeR(l1, a, 5);
+	CreateLNodeR(l2, b, 4);
+	l1->next = MergeTwoList(l1->next, l2->next);
+	PrintLNode(l1);
+}
