@@ -1,0 +1,270 @@
+#include<stdio.h>
+#include<malloc.h>
+#include <iostream>
+using namespace std;
+
+#define MAXSIZE 50
+
+//二叉树
+typedef struct BTNode {
+	int data;
+	struct BTNode* lchild;
+	struct BTNode* rchild;
+}BTNode;
+
+//创建二叉树
+BTNode* CreateBiTree()
+{
+	int k;
+	cin >> k;
+	BTNode* T = (BTNode*)malloc(sizeof(BTNode));
+	if (k == -1)
+		return NULL;
+	else
+	{
+		T->data = k;
+		T->lchild = CreateBiTree();
+		T->rchild = CreateBiTree();
+	}
+	return T;
+}
+//递归先序遍历二叉树
+void PreOrder(BTNode* T)
+{
+	if (T != NULL)
+	{
+		printf("%d ", T->data);
+		PreOrder(T->lchild);
+		PreOrder(T->rchild);
+	}
+}
+//递归中序遍历二叉树
+void InOrder(BTNode* T)
+{
+	if (T != NULL)
+	{
+		InOrder(T->lchild);
+		printf("%d ", T->data);
+		InOrder(T->rchild);
+	}
+}
+//递归后序遍历二叉树
+void PostOrder(BTNode* T)
+{
+	if (T != NULL)
+	{
+		PostOrder(T->lchild);
+		PostOrder(T->rchild);
+		printf("%d ", T->data);
+	}
+}
+//非递归先序遍历二叉树
+void PreOrder2(BTNode* T)
+{
+	if (T != NULL)
+	{
+		BTNode* Stack[MAXSIZE];
+		int top = -1;
+		BTNode* p;
+		Stack[++top] = T;
+		while (top!= -1)
+		{
+			p = Stack[top--];
+			printf("%d ", p->data);
+			if (p->rchild != NULL)
+				Stack[++top] = p->rchild;
+			if (p->lchild != NULL)
+				Stack[++top] = p->lchild;
+		}
+	}
+}
+//非递归中序遍历二叉树
+void InOrder2(BTNode* T)
+{
+	if (T != NULL)
+	{
+		BTNode* Stack[MAXSIZE];
+		int top = -1;
+		BTNode* p;
+		p = T;
+		while (top != -1 || p != NULL)
+		{
+			while (p != NULL)
+			{
+				Stack[++top] = p;
+				p = p->lchild;
+			}
+			if (top != -1)
+			{
+				p = Stack[top--];
+				printf("%d ", p->data);
+				p = p->rchild;
+			}
+		}
+	}
+}
+//非递归后序遍历二叉树
+void PostOrder2(BTNode* T)
+{
+	if (T != NULL)
+	{
+		BTNode* Stack1[MAXSIZE];
+		int top1 = -1;
+		BTNode* Stack2[MAXSIZE];
+		int top2 = -1;
+		BTNode* p = NULL;
+		Stack1[++top1] = T;
+		while (top1 != -1)
+		{
+			p = Stack1[top1--];
+			Stack2[++top2] = p;
+			if (p->lchild != NULL)
+				Stack1[++top1] = p->lchild;
+			if (p->rchild != NULL)
+				Stack1[++top1] = p->rchild;
+		}
+		while (top2 != -1)
+		{
+			p = Stack2[top2--];
+			printf("%d ", p->data);
+		}
+	}
+}
+//非递归层次遍历
+void LevelOrder(BTNode* T)
+{
+	int front, rear;
+	BTNode* que[MAXSIZE];
+	front = rear = 0;
+	BTNode* q;
+	if (T != NULL)
+	{
+		rear = (rear + 1) % MAXSIZE;
+		que[rear] = T;
+		while (front!=rear)
+		{
+			front = (front + 1) % MAXSIZE;
+			q = que[front];
+			printf("%d ", q->data);
+			if (q->lchild != NULL)
+			{
+				rear = (rear + 1) % MAXSIZE;
+				que[rear] = q->lchild;
+			}
+			if (q->rchild != NULL)
+			{
+				rear = (rear + 1) % MAXSIZE;
+				que[rear] = q->rchild;
+			}
+		}
+	}
+}
+//求二叉树的叶子节点数目
+int count(BTNode* T)
+{
+	int n1, n2;
+	if (T == NULL)
+		return 0;
+	else if (T->lchild == NULL && T->rchild == NULL)
+		return 1;
+	else
+	{
+		n1 = count(T->lchild);
+		n2 = count(T->rchild);
+		return n1 + n2;
+	}
+}
+//查找指定节点的层次
+void getNodeLayer(BTNode* T, int x, int layer)
+{
+	if (T == NULL)
+		return ;
+	if (T->data == x)
+	{
+		printf("\n\n节点%d所在的层数是%d", x, layer);
+		return ;
+	}
+	getNodeLayer(T->lchild, x, layer + 1);
+	getNodeLayer(T->rchild, x, layer + 1);
+}
+//求二叉树的深度
+int GetDepth(BTNode* T)
+{
+	int LD;
+	int RD;
+	if (T == NULL)
+		return 0;
+	else
+	{
+		LD = GetDepth(T->lchild);
+		RD = GetDepth(T->rchild);
+		return(LD > RD ? LD : RD) + 1;
+	}
+}
+//统计二叉树的节点个数
+int NodeCount(BTNode* T)
+{
+	if (T == NULL)
+		return 0;
+	else
+		return NodeCount(T->lchild) + NodeCount(T->rchild) + 1;
+}
+//求二叉排序树的指定节点位置
+int getNodeLayer2(BTNode* T, int x)
+{
+	int layer = 1;
+	BTNode* p = T;
+	while (p->data != x && p!=NULL)
+	{
+		if (p->data < x)
+			p = p->rchild;
+		else
+			p = p->lchild;
+		layer++;
+	}
+	if (p == NULL)
+		return 0;
+	return layer;
+	
+}
+//交换二叉树所有子树的位置
+void SwapBT(BTNode* T)
+{
+	if (T != NULL)
+	{
+		SwapBT(T->lchild);
+		SwapBT(T->rchild);
+		BTNode* temp = T->lchild;
+		T->lchild = T->rchild;
+		T->rchild = temp;
+	}
+}
+
+
+int main()
+{
+	BTNode* T = (BTNode*)malloc(sizeof(BTNode));
+	T = CreateBiTree();
+	printf("\n\n递归先序遍历的结果：");
+	PreOrder(T);
+	printf("\n\n非递归先序遍历的结果：");
+	PreOrder2(T);
+	printf("\n\n递归中序遍历的结果：");
+	InOrder(T);
+	printf("\n\n非递归中序遍历的结果：");
+	InOrder2(T);
+	printf("\n\n递归后序遍历的结果：");
+	PostOrder(T);
+	printf("\n\n非递归后序遍历的结果：");
+	PostOrder2(T);
+	printf("\n\n非递归层次遍历的结果：");
+	LevelOrder(T);
+	printf("\n\n叶子节点个数：%d", count(T));
+	getNodeLayer(T, 2, 1);
+	printf("\n\n此二叉树的深度是：%d", GetDepth(T));
+	printf("\n\n此二叉树的节点有：%d个", NodeCount(T));
+	printf("\n\n节点2的层数为：%d",getNodeLayer2(T, 2));
+	SwapBT(T);
+	printf("\n\n交换所有子树的二叉树：");
+	PreOrder(T);
+}
