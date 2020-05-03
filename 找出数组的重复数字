@@ -1,0 +1,26 @@
+数组a[n],存放1至n-1个数，其中某个数重复一次。写一个函数，找出那个被重复的数字，时间复杂度必须是O(n).
+
+
+#include<stdio.h>
+#define MAXSIZE 100
+
+int getnum(int a[],int len)
+{	//得到数组中重复的那个数字
+	int hash[MAXSIZE] = {0};
+	int i;
+	for (i = 0; i < len; i++)
+	{
+		if (hash[a[i]] == 0)
+			hash[a[i]] = a[i];
+		else
+			return a[i];
+	}
+}
+
+int main()
+{
+	int a[] = { 1,2,3,2,4,5,6,7,8,9 };
+	int k = getnum(a, 10);
+	printf("%d", k);
+	return 0;
+}
